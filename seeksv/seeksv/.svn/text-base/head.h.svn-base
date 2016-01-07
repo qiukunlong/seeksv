@@ -1,0 +1,16 @@
+#pragma once
+#include <math.h>
+#include "../../sam/bam.h"
+#include "../../sam/faidx.h"
+#include "../../sam/knetfile.h"
+#include "../../sam/sam.h"
+#include "../../sam/sam_view.h"
+#include "../../sam/xcurses.h"
+#include "../../sam/zlib.h"
+#include "../../sam/bgzf.h"
+#include "../../sam/glf.h"
+#include "../../sam/kstring.h"
+#include "../../sam/razf.h"
+#include "../../sam/sam_header.h"
+#include "../../sam/zconf.h"
+#include "../../sam/khash.h"
