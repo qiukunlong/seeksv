@@ -125,6 +125,7 @@ double CompareStringBeginFirst(string str1, string str2);
 
 
 bool IsUsefulSoftClip(const bam1_t *b);
+bool IsHardClip(const bam1_t *b);
 bool InsertSeq(multimap<pair<string, int>, ReadsInfo> &breakpoint2read, string chr, int pos, string seq_left, string qual_left, string seq_right, string qual_right, vector<pair<int, char> > &cigar, string read_id, double limit, bool aa);
 //break a sequence into aligned part and clipped part
 void GetSeq(const bam1_t *b, int begin_pos, int seq_left_len ,int seq_right_len, string &seq_left, string &qual_left, string &seq_right, string &qual_right, string &read_id);

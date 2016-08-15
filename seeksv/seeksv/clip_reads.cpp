@@ -12,6 +12,7 @@
  */
 
 #include "clip_reads.h"
+#include <algorithm>
 
 
 
@@ -213,6 +214,18 @@ bool IsUsefulSoftClip(const bam1_t *b)
 		return 0;
 }
 
+bool IsHardClip(const bam1_t *b)
+{
+	uint32_t k;
+	uint32_t *cigar = bam1_cigar(b);
+	int n_cigar = b->core.n_cigar;
+	
+	if ((cigar[0] & BAM_CIGAR_MASK) == BAM_CHARD_CLIP || (cigar[n_cigar - 1] & BAM_CIGAR_MASK) == BAM_CHARD_CLIP)
+		return 1;
+	else
+		return 0;
+}
+
 
 bool InsertSeq(multimap<pair<string, int>, ReadsInfo> &breakpoint2read, string chr, int pos, string seq_left, string qual_left, string seq_right, string qual_right, vector<pair<int, char> > &cigar, string read_id, double limit, bool aa)
 {
@@ -256,8 +269,8 @@ void GetSeq(const bam1_t *b, int begin_pos, int seq_left_len ,int seq_right_len,
 		for (int i = begin_pos; i < seq_left_len + begin_pos; ++i) qual_left.append(1, t[i] + 33);
 		for (int i = seq_left_len + begin_pos; i < seq_left_len + seq_right_len + begin_pos; ++i) qual_right.append(1, t[i] + 33);
 	}
-	transform(seq_left.begin(), seq_left.end(), seq_left.begin(), ::toupper);	
-	transform(seq_right.begin(), seq_right.end(), seq_right.begin(), ::toupper);	
+	std::transform(seq_left.begin(), seq_left.end(), seq_left.begin(), ::toupper);	
+	std::transform(seq_right.begin(), seq_right.end(), seq_right.begin(), ::toupper);	
 			
 	read_id = bam1_qname(b);
 }

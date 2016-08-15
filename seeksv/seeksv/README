@@ -162,4 +162,7 @@ Revision 42:
 	In order to save memory used in command getclip, add function template <typename Tout> void DisplaySClipReadsAndClipFq(multimap<pair<string, int>, ReadsInfo> &breakpoint2read, char c,  Tout &softfout, Tout &fqfout) and call this function in function `InputBamOutputReads(...)`
 	In order to save memory used in command getsv, read results of clip.bam and clip.gz alternately and process one by one. change `InputSoftInfoStoreBreakpoint(..)`
 
-
+seeksv version 1.2.1
+	Date:2016-07-06
+	In bwa 0.7.13 , bwa mem can generate Hard Clipped Reads and one read may be repeat in ajacent lines. In version seeksv 1.2.0 , seeksv treat all reads in bwa bam file have only one line result. Fix this bug to fit bwa 0.7.13 alignment results.
+	Fix a bug while calculating insertsize and deviation and while finding discordant read pairs in case of bams with hard clipped reads inside it

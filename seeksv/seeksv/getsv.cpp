@@ -10,6 +10,7 @@
  ***************************************
  */
 #include "getsv.h"
+#include <algorithm>
 
 const int kCrossLength = 5;
 
@@ -1018,6 +1019,8 @@ void FindDiscordantReadPairs(samfile_t *samfin, bam_index_t *idx, multimap<Junct
 		while ((ret = bam_iter_read(fp, iter, b)) >= 0)
 		{
 			if (__g_skip_aln(samfin->header, b)) continue;
+			// Add this to ignore hard clipped reads 2016-07-07
+			if (IsHardClip(b)) continue;
 			if ((b->core.flag&BAM_FDUP) || (b->core.flag&BAM_FUNMAP) || (b->core.flag&BAM_FMUNMAP)|| IsConcordant(samfin->header, b, mean_insert_size, deviation, times)) continue;
 			mtid = BamGetTid(seq_name2tid, junction2other_it->first.down_chr);
 			if (mtid != -1 && mtid == b->core.mtid) //&& b->core.pos + b->core.l_qseq <= junction2other_it->first.up_pos + kCrossLength && b->core.mpos + 1 >= junction2other_it->first.down_pos - kCrossLength)
@@ -1145,6 +1148,8 @@ int FindDiscordantReadPairs(samfile_t *samfin, bam_index_t *idx, Junction &junct
 	while ((ret = bam_iter_read(fp, iter, b)) >= 0)
 	{
 		if (__g_skip_aln(samfin->header, b)) continue;
+			// Add this to ignore hard clipped reads 2016-07-07
+		if (IsHardClip(b)) continue;
 		if ((b->core.flag&BAM_FDUP) || (b->core.flag&BAM_FUNMAP) || (b->core.flag&BAM_FMUNMAP)|| IsConcordant(samfin->header, b, mean_insert_size, deviation, times)) continue;
 		mtid = BamGetTid(seq_name2tid, junction.down_chr);
 		if (mtid != -1 && mtid == b->core.mtid) //&& b->core.pos + b->core.l_qseq <= junction.up_pos + kCrossLength && b->core.mpos + 1 >= junction.down_pos - kCrossLength)

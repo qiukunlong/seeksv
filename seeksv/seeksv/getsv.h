@@ -471,8 +471,11 @@ template <typename Tinstream> void InputSoftInfoStoreBreakpoint(string clipfile,
 			{
 				// when read failed continue
 				if (__g_skip_aln(samfin->header, b)) continue;
+				if (IsHardClip(b)) continue;
+
 				AlignInfo clipped_align_info;
 				GetAlignInfo(samfin, b, clipped_align_info);
+			
 
 				if (last_clipped_seq == bam1_qname(b))
 				{

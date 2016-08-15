@@ -9,8 +9,8 @@
 #include "cluster.h"
 #include "process_bwasw.h"
 
-const char *kVersion = "1.2.0";
-const char *kRevision = "42";
+const char *kVersion = "1.2.1";
+//const char *kRevision = "43";
 const int kCommandQuantity = 4;
 const double kThreshold = 0.85;
 const int kNumberOfReadPair = 5000000;
@@ -59,11 +59,10 @@ int main(int argc, char *argv[])
 
 void Usage(char *prog)
 {
-	cerr << "Program: seeksv (a software used to dectect structural variation)" << '\n'
+	cerr << "Program: seeksv (software used to dectect structural variations)" << '\n'
 		 //<< "Compile Date: " << system("date") << '\n'
 		 << "Version: " << kVersion << '\n'
-		 << "Revision: " << kRevision << '\n'
-		 << "Contract: " << "Kunlong Qiu(qiukunlong@genomics.cn, qkl871118@qq.com)\n\n"
+		 << "Contract: " << "Kunlong Qiu(qkl871118@qq.com)\n\n"
 		 << "Usage: " << prog << " <command> [option]\n\n"
 		 << "Command: " << "getclip\tget soft-clipped reads\n"
 		 << "         " << "getsv  \tget final sv\n"

@@ -3,12 +3,14 @@
  * cluster.cpp                         *
  *                                     *
  *  Created on:   2013-1-7             *
+ *  Updated on:   2016-7-7             *
  *  Author:       Qiu Kunlong          *
  *                                     *
  ***************************************
  */
 #include "cluster.h"
 #include "head.h"
+#include "clip_reads.h"
 
 bool CalculateInsertsizeDeviation(string file, int min_mapQ, int read_pair_used, int &mean_insert_size, int &deviation)
 {
@@ -55,6 +57,8 @@ bool CalculateInsertsizeDeviation(string file, int min_mapQ, int read_pair_used,
 //			vec_insert_sizes.push_back(insert_size);
 //			++read_pair_number;
 //		}
+//      ignore hard clipped reads
+		if (IsHardClip(b)) continue;
 		if ((b->core.flag&BAM_FPAIRED) && (b->core.flag&BAM_FPROPER_PAIR) && !(b->core.flag&BAM_FDUP) && insert_size > 0)
 		{
 			total_insert_size += insert_size;
