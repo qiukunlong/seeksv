@@ -93,6 +93,7 @@ void GetSClipReads(const bam_header_t *header, const bam1_t *b, multimap<pair<st
 	uint8_t *s;
 	if (op1 == BAM_CSOFT_CLIP && op2 != BAM_CSOFT_CLIP || op1 != BAM_CSOFT_CLIP && op2 == BAM_CSOFT_CLIP)
 	{
+		cerr << "Branch1" << endl;
 		s = bam_aux_get(b, "XC");
 		XC_value = bam_aux2i(s);
 
@@ -105,6 +106,7 @@ void GetSClipReads(const bam_header_t *header, const bam1_t *b, multimap<pair<st
 			seq_left_len = (bam1_cigar(b)[0] >> BAM_CIGAR_SHIFT);
 			seq_right_len = b->core.l_qseq - seq_left_len;
 			pos = b->core.pos + 1;
+			cerr << "Branch1-1" << '\t' << pos << '\t' << seq_left_len << '\t' << seq_right_len << endl;
 			GetSeq(b, 0, seq_left_len , seq_right_len, seq_left, qual_left, seq_right, qual_right, read_id);
 			InsertSeq(breakpoint2read_l, chr, pos, seq_left, qual_left, seq_right, qual_right, cigar_vec, read_id, limit, LEFT_CLIPPED);
 		}
@@ -115,10 +117,12 @@ void GetSClipReads(const bam_header_t *header, const bam1_t *b, multimap<pair<st
 			GetSeq(b, 0, seq_left_len , seq_right_len, seq_left, qual_left, seq_right, qual_right, read_id);
 			pos = b->core.pos + map_len_in_ref;
 			InsertSeq(breakpoint2read_r, chr, pos, seq_left, qual_left, seq_right, qual_right, cigar_vec, read_id, limit, RIGHT_CLIPPED);
+			cerr << "Branch1-2" << '\t' << pos << '\t' << seq_left_len << '\t' << seq_right_len << endl;
 		}
 	}
 	else if (op1 == BAM_CSOFT_CLIP && op2 == BAM_CSOFT_CLIP)
 	{
+		cerr << "Branch2" << endl;
 		seq_left_len = (bam1_cigar(b)[0] >> BAM_CIGAR_SHIFT);
 		int seq_right_clipped_len = (bam1_cigar(b)[b->core.n_cigar -1] >> BAM_CIGAR_SHIFT);
 		seq_right_len = b->core.l_qseq - seq_left_len - seq_right_clipped_len;
@@ -136,12 +140,14 @@ void GetSClipReads(const bam_header_t *header, const bam1_t *b, multimap<pair<st
 				GetSeq(b, 0, seq_left_len , seq_right_len, seq_left, qual_left, seq_right, qual_right, read_id);
 				pos = b->core.pos + 1;
 				InsertSeq(breakpoint2read_l, chr, pos, seq_left, qual_left, seq_right, qual_right, cigar_vec, read_id, limit, LEFT_CLIPPED);
+				cerr << "Branch2-1" << '\t' << pos << endl;
 			}
 			else //the right clipped sequence is useful
 			{
 				GetSeq(b, seq_left_len, seq_right_len, seq_right_clipped_len, seq_left, qual_left, seq_right, qual_right, read_id);
 				pos = b->core.pos + map_len_in_ref;
 				InsertSeq(breakpoint2read_r, chr, pos, seq_left, qual_left, seq_right, qual_right, cigar_vec, read_id, limit, RIGHT_CLIPPED);
+				cerr << "Branch2-2" << '\t' << pos << endl;
 			}
 		}
 		else //both clipped sequence is useful
@@ -149,6 +155,7 @@ void GetSClipReads(const bam_header_t *header, const bam1_t *b, multimap<pair<st
 			GetSeq(b, 0, seq_left_len , seq_right_len, seq_left, qual_left, seq_right, qual_right, read_id);
 			pos = b->core.pos + 1;
 			InsertSeq(breakpoint2read_l, chr, pos, seq_left, qual_left, seq_right, qual_right, cigar_vec, read_id, limit, LEFT_CLIPPED);
+			cerr << "Branch2-3" << '\t' << pos << endl;
 			seq_left.clear();
 			qual_left.clear();
 			seq_right.clear();
@@ -156,6 +163,7 @@ void GetSClipReads(const bam_header_t *header, const bam1_t *b, multimap<pair<st
 			GetSeq(b, seq_left_len, seq_right_len, seq_right_clipped_len, seq_left, qual_left, seq_right, qual_right, read_id);
 			pos = b->core.pos + map_len_in_ref;
 			InsertSeq(breakpoint2read_r, chr, pos, seq_left, qual_left, seq_right, qual_right, cigar_vec, read_id, limit, RIGHT_CLIPPED);
+			cerr << "Branch2-3" << '\t' << pos << endl;
 		}
 	}
 

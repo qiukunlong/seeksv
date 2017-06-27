@@ -166,3 +166,8 @@ seeksv version 1.2.1
 	Date:2016-07-06
 	In bwa 0.7.13 , bwa mem can generate Hard Clipped Reads and one read may be repeat in ajacent lines. In version seeksv 1.2.0 , seeksv treat all reads in bwa bam file have only one line result. Fix this bug to fit bwa 0.7.13 alignment results.
 	Fix a bug while calculating insertsize and deviation and while finding discordant read pairs in case of bams with hard clipped reads inside it
+
+seeksv version 1.2.2
+	Date:2016-10-13
+	Add function while value of seeksv getsv -n is 0 and value of seeksv somatic -n is 0 , donot use abnormal paired read function to dectect sv. 
+	From this version on, By default if seeksv getsv -n < 100000, seeksv will reset this value to 0.

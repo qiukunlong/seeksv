@@ -9,7 +9,7 @@
 #include "cluster.h"
 #include "process_bwasw.h"
 
-const char *kVersion = "1.2.1";
+const char *kVersion = "1.2.2-debug";
 //const char *kRevision = "43";
 const int kCommandQuantity = 4;
 const double kThreshold = 0.85;
@@ -93,7 +93,7 @@ void Usage(char *prog, char *command, int i)
 			 << "         -q <int>              Minimum mapping quality of discordant read pair [20]\n"
 			 << "         -Q <int>              Minimum mapping quality of clipped sequences [1], if you use bwa samse to align the reads, please set\n"              << "                               this flag to 20\n"
 			 << "         -w <int>              Minimum mapping quality connected  readthrough reads [1]\n"
-			 << "         -n <int>              Number of segment(read pairs) used to calculate insert size [5000000]\n"
+			 << "         -n <int>              Number of segment(read pairs) used to calculate insert size default [5000000], if you donot want to use abnormal read pairs to call sv, set this parameter to 0.\n"
 			 << "         -r                    Turn off rescue mode. When rescure mode is on, the a SV with only 1 side with enough soft-clipped \n"
 			 << "                               reads is considered as a valid one instead of rejecting it.  Default on.\n"
 			 << "         -a <int>              When rescure mode is on, minimum number of soft-clipped reads on one side [5]\n" 
@@ -117,7 +117,7 @@ void Usage(char *prog, char *command, int i)
 		cerr << "         -q <int>              Minimum mapping quality of discordant read pair [20]" << endl;
 		cerr << "         -l <int>              Maximum search length to find microhomology [30]" << endl;
 		cerr << "         -m <int>              Minimum length of the clipped sequence  in normal [10]" << endl;
-		cerr << "         -n <int>              Number of segment(read pairs) used to calculate insert size [5000000]" << endl;
+		cerr << "         -n <int>              Number of segment(read pairs) used to calculate insert size default [5000000], if you donot want to use abnormal read pairs to call sv, set this parameter to 0." << endl;
 		break;
 //	case 3:
 //		cerr << "Usage: " << prog << " " << command << " [options] <orignal sorted bamfile>\n" << endl;
@@ -252,43 +252,48 @@ void CallGetsv(int argc, char *argv[], int i)
 //	ChangeDiffOrientationJuntion(uppos2breakpoint_diff_strand_5clip, uppos2breakpoint_diff_strand_3clip, aligned2clipped, flank, threshold);
 
 	int mean_insert_size = 0, deviation = 0;
-
-	CalculateInsertsizeDeviation(original_bam, min_mapQ, read_pair_used, mean_insert_size, deviation);
-	cerr << "'CalculateInsertsizeDeviation' finished" << endl;
 	
-	samfile_t *samfin;
-	char in_mode[5], *fn_list = 0;
-	in_mode[0] = 'r';
-	int is_bamin = 0;
-	if (original_bam.rfind(".bam") == original_bam.size() - 4)
-	{
-		//if in_mode[1] == 'b', it will read a bam file
-		in_mode[1] = 'b';
-		is_bamin = 1;
+	if (read_pair_used >= 100000) {
+		CalculateInsertsizeDeviation(original_bam, min_mapQ, read_pair_used, mean_insert_size, deviation);
+		cerr << "'CalculateInsertsizeDeviation' finished" << endl;
+		
+		samfile_t *samfin;
+		char in_mode[5], *fn_list = 0;
+		in_mode[0] = 'r';
+		int is_bamin = 0;
+		if (original_bam.rfind(".bam") == original_bam.size() - 4)
+		{
+			//if in_mode[1] == 'b', it will read a bam file
+			in_mode[1] = 'b';
+			is_bamin = 1;
+		}
+	
+	    if ((samfin = samopen(original_bam.c_str(), in_mode, fn_list)) == 0)
+		{
+			cerr << "[main_samview] fail to open file for reading." << endl;
+	   		exit(1);
+		}
+		if (samfin->header == 0) 
+		{
+			cerr << "[main_samview] fail to read the header." << endl;
+			exit(1);
+		}
+	
+		bam_index_t *idx = 0;
+		if (is_bamin) idx = bam_index_load(original_bam.c_str()); // load BAM index
+		if (idx == 0)
+		{ // index is unavailable
+			cerr << "[main_samview] random alignment retrieval only works for indexed BAM files.\n" << endl;
+			cerr << original_bam << endl;
+			exit(1);
+		}
+		FindDiscordantReadPairs(samfin, idx, junction2other, min_mapQ, mean_insert_size, deviation, times);
+		bam_index_destroy(idx);
+		cerr << "'FindDiscordantReadPairs' finished" << endl;
 	}
-
-    if ((samfin = samopen(original_bam.c_str(), in_mode, fn_list)) == 0)
-	{
-		cerr << "[main_samview] fail to open file for reading." << endl;
-   		exit(1);
+	else {
+		min_abnormal_read_pair_no = 0;
 	}
-	if (samfin->header == 0) 
-	{
-		cerr << "[main_samview] fail to read the header." << endl;
-		exit(1);
-	}
-
-	bam_index_t *idx = 0;
-	if (is_bamin) idx = bam_index_load(original_bam.c_str()); // load BAM index
-	if (idx == 0)
-	{ // index is unavailable
-		cerr << "[main_samview] random alignment retrieval only works for indexed BAM files.\n" << endl;
-		cerr << original_bam << endl;
-		exit(1);
-	}
-	FindDiscordantReadPairs(samfin, idx, junction2other, min_mapQ, mean_insert_size, deviation, times);
-	bam_index_destroy(idx);
-	cerr << "'FindDiscordantReadPairs' finished" << endl;
 
 	if (output_depth == 1) 
 	{
@@ -408,7 +413,9 @@ void CallSomatic(int argc, char *argv[], int i)
 		ReadsClipReads<ifstream> (clipped_file, aligned_pos2reads_3clip, aligned_pos2reads_5clip, min_len_of_clipped_seq);
 	}
 	int mean_insert_size = 0, deviation = 0;
-	CalculateInsertsizeDeviation(normal_bam_file, min_mapQ, read_pair_used, mean_insert_size, deviation);
+	if (read_pair_used >= 100000) {
+		CalculateInsertsizeDeviation(normal_bam_file, min_mapQ, read_pair_used, mean_insert_size, deviation);
+	}
 	ReadTumorFileAndOutputSomaticInfo(normal_bam_file, tumor_file, somatic_file, aligned_pos2reads_3clip, aligned_pos2reads_5clip, min_mapQ, offset, min_map_rate, mean_insert_size, deviation, 4);
 }
 

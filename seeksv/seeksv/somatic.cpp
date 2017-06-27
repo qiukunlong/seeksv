@@ -139,7 +139,9 @@ void ReadTumorFileAndOutputSomaticInfo(string normal_bam_file, string file, stri
 						++mmap_it;
 					}
 					int normal_abnormal_read_pair_no = 0;
-					normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					if (mean_insert_size != 0) {
+						normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					}
 					fout << up_chr << '\t' << up_pos << '\t' << up_strand << '\t' << up_reads_no << '\t' << down_chr << '\t' << down_pos << '\t' << down_strand << '\t' << down_reads_no << '\t' << microhomology_length << '\t' << abnormal_read_pair_no << '\t' << sv_type << '\t' << up_depth << '\t' << down_depth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << up_clip_rate << '\t' << down_clip_rate << '\t' << up_cigar << '\t' << down_cigar << '\t' << up_seq << '\t' << down_seq << '\t' << normal_left_reads << '\t' << normal_right_reads << '\t' <<  normal_abnormal_read_pair_no << endl;
 				}
 				else if (down_reads_no == 0)
@@ -166,7 +168,9 @@ void ReadTumorFileAndOutputSomaticInfo(string normal_bam_file, string file, stri
 						++mmap_it;
 					}
 					int normal_abnormal_read_pair_no = 0;
-					normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					if (mean_insert_size != 0) {
+						normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					}
 					fout << up_chr << '\t' << up_pos << '\t' << up_strand << '\t' << up_reads_no << '\t' << down_chr << '\t' << down_pos << '\t' << down_strand << '\t' << down_reads_no << '\t' << microhomology_length << '\t' << abnormal_read_pair_no << '\t' << sv_type << '\t' << up_depth << '\t' << down_depth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << up_clip_rate << '\t' << down_clip_rate << '\t' << up_cigar << '\t' << down_cigar << '\t' << up_seq << '\t' << down_seq << '\t' << normal_left_reads << '\t' << normal_right_reads << '\t' <<  normal_abnormal_read_pair_no << endl;
 				}
 				else
@@ -212,7 +216,9 @@ void ReadTumorFileAndOutputSomaticInfo(string normal_bam_file, string file, stri
 					++mmap_it_pair.first;
 				}
 				int normal_abnormal_read_pair_no = 0;
-				normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+				if (mean_insert_size != 0) {
+					normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+				}
 				fout << up_chr << '\t' << up_pos << '\t' << up_strand << '\t' << up_reads_no << '\t' << down_chr << '\t' << down_pos << '\t' << down_strand << '\t' << down_reads_no << '\t' << microhomology_length << '\t' << abnormal_read_pair_no << '\t' << sv_type << '\t' << up_depth << '\t' << down_depth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << up_clip_rate << '\t' << down_clip_rate << '\t' << up_cigar << '\t' << down_cigar << '\t' << up_seq << '\t' << down_seq << '\t' << normal_left_reads << '\t' << normal_right_reads << '\t' <<  normal_abnormal_read_pair_no << endl;
 			}
 			else
@@ -247,7 +253,9 @@ void ReadTumorFileAndOutputSomaticInfo(string normal_bam_file, string file, stri
 						++mmap_it;
 					}
 					int normal_abnormal_read_pair_no = 0;
-					normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					if (mean_insert_size != 0) {
+						normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					}
 					fout << up_chr << '\t' << up_pos << '\t' << up_strand << '\t' << up_reads_no << '\t' << down_chr << '\t' << down_pos << '\t' << down_strand << '\t' << down_reads_no << '\t' << microhomology_length << '\t' << abnormal_read_pair_no << '\t' << sv_type << '\t' << up_depth << '\t' << down_depth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << up_clip_rate << '\t' << down_clip_rate << '\t' << up_cigar << '\t' << down_cigar << '\t' << up_seq << '\t' << down_seq << '\t' << normal_left_reads << '\t' << normal_right_reads << '\t' <<  normal_abnormal_read_pair_no << endl;
 				}
 				else if (down_reads_no == 0)
@@ -280,7 +288,9 @@ void ReadTumorFileAndOutputSomaticInfo(string normal_bam_file, string file, stri
 						++mmap_it;
 					}
 					int normal_abnormal_read_pair_no = 0;
-					normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					if (mean_insert_size != 0) {
+						normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					}
 					fout << up_chr << '\t' << up_pos << '\t' << up_strand << '\t' << up_reads_no << '\t' << down_chr << '\t' << down_pos << '\t' << down_strand << '\t' << down_reads_no << '\t' << microhomology_length << '\t' << abnormal_read_pair_no << '\t' << sv_type << '\t' << up_depth << '\t' << down_depth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << up_clip_rate << '\t' << down_clip_rate << '\t' << up_cigar << '\t' << down_cigar << '\t' << up_seq << '\t' << down_seq << '\t' << normal_left_reads << '\t' << normal_right_reads << '\t' <<  normal_abnormal_read_pair_no << endl;
 				}
 				else
@@ -324,7 +334,9 @@ void ReadTumorFileAndOutputSomaticInfo(string normal_bam_file, string file, stri
 					++mmap_it_pair.first;
 				}
 				int normal_abnormal_read_pair_no = 0;
-				normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+				if (mean_insert_size != 0) {
+					normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+				}
 				fout << up_chr << '\t' << up_pos << '\t' << up_strand << '\t' << up_reads_no << '\t' << down_chr << '\t' << down_pos << '\t' << down_strand << '\t' << down_reads_no << '\t' << microhomology_length << '\t' << abnormal_read_pair_no << '\t' << sv_type << '\t' << up_depth << '\t' << down_depth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << up_clip_rate << '\t' << down_clip_rate << '\t' << up_cigar << '\t' << down_cigar << '\t' << up_seq << '\t' << down_seq << '\t' << normal_left_reads << '\t' << normal_right_reads << '\t' <<  normal_abnormal_read_pair_no << endl;
 
 			}
@@ -359,7 +371,9 @@ void ReadTumorFileAndOutputSomaticInfo(string normal_bam_file, string file, stri
 						++mmap_it;
 					}
 					int normal_abnormal_read_pair_no = 0;
-					normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					if (mean_insert_size != 0) {
+						normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					}
 					fout << up_chr << '\t' << up_pos << '\t' << up_strand << '\t' << up_reads_no << '\t' << down_chr << '\t' << down_pos << '\t' << down_strand << '\t' << down_reads_no << '\t' << microhomology_length << '\t' << abnormal_read_pair_no << '\t' << sv_type << '\t' << up_depth << '\t' << down_depth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << up_clip_rate << '\t' << down_clip_rate << '\t' << up_cigar << '\t' << down_cigar << '\t' << up_seq << '\t' << down_seq << '\t' << normal_left_reads << '\t' << normal_right_reads << '\t' <<  normal_abnormal_read_pair_no << endl;
 				}
 				else if (down_reads_no == 0)
@@ -391,7 +405,9 @@ void ReadTumorFileAndOutputSomaticInfo(string normal_bam_file, string file, stri
 						++mmap_it;
 					}
 					int normal_abnormal_read_pair_no = 0;
-					normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					if (mean_insert_size != 0) {
+						normal_abnormal_read_pair_no = FindDiscordantReadPairs(samfin, idx, junction, min_mapQ, mean_insert_size, deviation, times);
+					}
 					fout << up_chr << '\t' << up_pos << '\t' << up_strand << '\t' << up_reads_no << '\t' << down_chr << '\t' << down_pos << '\t' << down_strand << '\t' << down_reads_no << '\t' << microhomology_length << '\t' << abnormal_read_pair_no << '\t' << sv_type << '\t' << up_depth << '\t' << down_depth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << up_clip_rate << '\t' << down_clip_rate << '\t' << up_cigar << '\t' << down_cigar << '\t' << up_seq << '\t' << down_seq << '\t' << normal_left_reads << '\t' << normal_right_reads << '\t' <<  normal_abnormal_read_pair_no << endl;
 				}
 				else
