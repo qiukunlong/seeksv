@@ -3,7 +3,7 @@ v0.4.0:
 v0.5.0:
 	In v0.4.0, seeksv stores id of soft-clipped reads.But it consumes too much memory.So this version doesn't store id of soft-clipped reads.
 v0.6.0
-	At the function of calling somatic sv.
+	Add the function of calling somatic sv.
 v0.6.1
 	Change the algorithm of calculate depth of breakpoint, in order to reduce the running time.	
 v0.6.2
@@ -171,3 +171,6 @@ seeksv version 1.2.2
 	Date:2016-10-13
 	Add function while value of seeksv getsv -n is 0 and value of seeksv somatic -n is 0 , donot use abnormal paired read function to dectect sv. 
 	From this version on, By default if seeksv getsv -n < 100000, seeksv will reset this value to 0.
+	Date:2017-06-27
+	Change default value of getclip -t, getsv -t, somatic -t from 0.85 to 0.95
+	Remove option `-R` of getsv, from this version, donot filter SVs by depth of the break coordinate

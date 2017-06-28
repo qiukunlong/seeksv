@@ -9,15 +9,15 @@
 #include "cluster.h"
 #include "process_bwasw.h"
 
-const char *kVersion = "1.2.2-debug";
+const char *kVersion = "1.2.2";
 //const char *kRevision = "43";
 const int kCommandQuantity = 4;
-const double kThreshold = 0.85;
+const double kThreshold = 0.95;
 const int kNumberOfReadPair = 5000000;
 
-void Usage(char *prog);
-void Usage(char *prog, char *command, int i);
-char *comarray[kCommandQuantity] = {"getclip", "getsv", "somatic", "cluster"};
+void Usage(const char *prog);
+void Usage(const char *prog, char *command, int i);
+const char *comarray[kCommandQuantity] = {"getclip", "getsv", "somatic", "cluster"};
 void CallGetclip(int argc, char *argv[], int i);
 void CallGetsv(int argc, char *argv[], int i);
 void CallSomatic(int argc, char *argv[], int i);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	}
 }
 
-void Usage(char *prog)
+void Usage(const char *prog)
 {
 	cerr << "Program: seeksv (software used to dectect structural variations)" << '\n'
 		 //<< "Compile Date: " << system("date") << '\n'
@@ -72,14 +72,14 @@ void Usage(char *prog)
 }
 
 
-void Usage(char *prog, char *command, int i)
+void Usage(const char *prog, char *command, int i)
 {
 	switch (i)
 	{
 	case 0:
 		//cerr << "Usage: " << prog << " " << command << " [options] <in.sorted.bamfile> <out.soft clipped reads file> <out clipped sequence fastq file>\n\n";
 		cerr << "Usage: " << prog << " " << command << " [options] <in.sorted.bamfile>\n\n";
-		cerr << "Options: -t <double>           Threshold of match rate while combining two soft-clipped reads [0.85]" << endl;
+		cerr << "Options: -t <double>           Threshold of match rate while combining two soft-clipped reads [0.95]" << endl;
 		cerr << "         -q <int>              Minimum mapping quality of soft-clipped reads [20]" << endl;
 		cerr << "         -s                    Save the low quality sequence clipped before alignment by bwa." << endl;
 		cerr << "         -o <string>           Prefix of output files [output]" << endl;
@@ -88,7 +88,7 @@ void Usage(char *prog, char *command, int i)
 		cerr << "Usage: " << prog << " " << command << " [options] <bamfile of clipped sequence> <orignal sorted bamfile> <soft-clipped reads file> <breakpoint> <unmaped clipped sequence fastq result>\n"
 			 << "Options: -F <FILE>             Samfile/Bamfile of connected readthrough reads\n" 
 		//	 << "         -B <FILE>             temp breakpoint(sv) result\n"
-			 << "         -t <double>           Threshold of match rate while combining two soft-clipped reads [0.85]\n" 
+			 << "         -t <double>           Threshold of match rate while combining two soft-clipped reads [0.95]\n" 
 			 << "         -l <int>              Maximum search length to find microhomology[50]\n"
 			 << "         -q <int>              Minimum mapping quality of discordant read pair [20]\n"
 			 << "         -Q <int>              Minimum mapping quality of clipped sequences [1], if you use bwa samse to align the reads, please set\n"              << "                               this flag to 20\n"
@@ -101,7 +101,6 @@ void Usage(char *prog, char *command, int i)
 			 << "         -d <int>              Minimum distance between the clipped sequence position and the aligned sequence position [50]\n"
 			 << "         -D                    Do not calculate depth of the breakpoints and their ajacency regions\n"
 			 << "         -e <int>              Minimum number of read pairs which support the junction [0]\n"
-			 << "         -R <int>              Minimun number of coverage to be treated as repetitive [500]\n"
 			 << "         -f <int>              Minimun mutation frequency(left_pos_clip_percentage >= 0.1 or right_pos_clip_percentage >= 0.1) [0.1].\n"
 			 << "                               If you set -D, this value is invalid and set to [0].\n"
 			 << "         -T <int>              Maximum length of microhomology, microhomology length longer than [50] will be filtered\n"
@@ -113,7 +112,7 @@ void Usage(char *prog, char *command, int i)
 		
 	case 2:
 		cerr << "Usage: " << prog << " " << command << " [options] <normal original bam file> <normal soft-clipped reads file> <tumor breakpoint file> <output somatic breakpoint file>\n" << endl;
-		cerr << "         -t <int>              Threshold of match rate while comparing two soft-clipped reads [0.85]" << endl;
+		cerr << "         -t <int>              Threshold of match rate while comparing two soft-clipped reads [0.95]" << endl;
 		cerr << "         -q <int>              Minimum mapping quality of discordant read pair [20]" << endl;
 		cerr << "         -l <int>              Maximum search length to find microhomology [30]" << endl;
 		cerr << "         -m <int>              Minimum length of the clipped sequence  in normal [10]" << endl;
@@ -163,7 +162,7 @@ void CallGetsv(int argc, char *argv[], int i)
 {
 	string connect_bam, temp_breakpoint;
 	double threshold = kThreshold, frequency = 0.1;
-	int c, flank = 50, min_mapQ = 20, min_mapQ1 = 1, min_mapQ2 = 1, read_pair_used = 5000000, baseQ = 0, min_no_one_side_clipped_reads = 5, sum_min_no_both_clipped_reads = 3, min_distance = 50, microhomology_length = 50, times = 4, min_abnormal_read_pair_no = 0, repeat_coverage = 500, flank_length = 200, min_seq_len = 30, max_seq_indel_no = 1;
+	int c, flank = 50, min_mapQ = 20, min_mapQ1 = 1, min_mapQ2 = 1, read_pair_used = 5000000, baseQ = 0, min_no_one_side_clipped_reads = 5, sum_min_no_both_clipped_reads = 3, min_distance = 50, microhomology_length = 50, times = 4, min_abnormal_read_pair_no = 0, flank_length = 200, min_seq_len = 30, max_seq_indel_no = 1;
 	bool rescure_mode = 1;
 	bool output_depth = 1;
 	while ((c = getopt(argc, argv, "F:B:t:l:q:Q:w:n:a:b:d:e:m:i:R:f:T:L:rD")) >= 0)
@@ -186,7 +185,6 @@ void CallGetsv(int argc, char *argv[], int i)
 		case 'm': min_seq_len = atoi(optarg); break;
 		case 'i': max_seq_indel_no = atoi(optarg); break;
 		case 'D': output_depth = 0; break;
-		case 'R': repeat_coverage = atoi(optarg); break;
 		case 'f': frequency = atof(optarg); break;
 		case 'T': microhomology_length = atoi(optarg); break;
 		case 'L': flank_length = atoi(optarg); break;
@@ -241,7 +239,6 @@ void CallGetsv(int argc, char *argv[], int i)
 	else 
 		InputSoftInfoStoreBreakpoint<ifstream> (clipfile, file, read_id2align_info, junction2other, aligned2clipped, threshold);
 	cerr << "'InputSoftInfoStoreBreakpoint' finished" << endl;
-
 	MergeJunction(junction2other, flank);
 //	cerr << "'MergeJunction' finished" << endl;
 
@@ -331,7 +328,7 @@ void CallGetsv(int argc, char *argv[], int i)
 		++junction2other_it;
 	}
 	*/
-	OutputBreakpoint(fout, junction2other, pos2depth, range2depth, junction2range_pair, rescure_mode, min_no_one_side_clipped_reads, sum_min_no_both_clipped_reads, min_abnormal_read_pair_no, repeat_coverage, frequency, min_distance, microhomology_length, min_seq_len, max_seq_indel_no);
+	OutputBreakpoint(fout, junction2other, pos2depth, range2depth, junction2range_pair, rescure_mode, min_no_one_side_clipped_reads, sum_min_no_both_clipped_reads, min_abnormal_read_pair_no, frequency, min_distance, microhomology_length, min_seq_len, max_seq_indel_no);
 
 	ofstream foutuq(clip_unmap_fq_file.c_str());
 	if (!foutuq) { cerr << "Cannot open file " << clip_unmap_fq_file << endl; exit(1); }
@@ -376,7 +373,7 @@ void CallGetsv(int argc, char *argv[], int i)
 void CallSomatic(int argc, char *argv[], int i)
 {
 	int offset = 30, c, min_len_of_clipped_seq = 10, read_pair_used = 5000000, min_mapQ = 20;
-	double min_map_rate = 0.85;
+	double min_map_rate = 0.95;
 	while ((c = getopt(argc, argv, "t:q:l:m:n:")) >= 0)
 	{
 		switch (c)

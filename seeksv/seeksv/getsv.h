@@ -388,7 +388,7 @@ void MergeOverlap(map<ChrRange, unsigned long> &range2depth, map<pair<string, in
  @param   min_seq_len                       Minimum length of up_seq or down_seq near the breakpoint , if abnormal_read_pair_no is larger than 0, this parameter is invalid
  @param   max_seq_indel_no                  Maximum indel number of up_seq or down_seq near the breakpoint, if abnormal_read_pair_no is larger than 0, this parameter is invalid
 */
-void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2other, map<pair<string, int>, int> &pos2depth, map<ChrRange , unsigned long> &range2depth, map<Junction, pair<pair<ChrRange, ChrRange>, pair<ChrRange, ChrRange> > > &junction2range_pair, bool rescure_mode, int min_no_one_side_clipped_reads, int sum_min_no_both_clipped_reads, int min_abnormal_read_pair_no, int repeat_coverage, double frequency, int min_distance, int max_microhomology, int min_seq_len, int max_seq_indel_no);
+void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2other, map<pair<string, int>, int> &pos2depth, map<ChrRange , unsigned long> &range2depth, map<Junction, pair<pair<ChrRange, ChrRange>, pair<ChrRange, ChrRange> > > &junction2range_pair, bool rescure_mode, int min_no_one_side_clipped_reads, int sum_min_no_both_clipped_reads, int min_abnormal_read_pair_no, double frequency, int min_distance, int max_microhomology, int min_seq_len, int max_seq_indel_no);
 void OutputOneendUnmapBreakpoint(ofstream &fout, ofstream &fout1, multimap<pair<string, int>, ClipReads> &aligned2clipped, map<pair<string, int>, int> &pos2depth);
 
 
@@ -441,7 +441,6 @@ template <typename Tinstream> void InputSoftInfoStoreBreakpoint(string clipfile,
     if ((samfin = samopen(file.c_str(), in_mode, fn_list)) == 0) { cerr << "[main_samview] fail to open file for reading." << endl; delete samfin; exit(1); }
 	if (samfin->header == 0) { cerr << "[main_samview] fail to read the header." << endl; exit(1); }
 
-	map<string, pair<string, string> > read_id2seq_pair;
 
 	b = bam_init1();
 	int ret = 0;
@@ -465,7 +464,6 @@ template <typename Tinstream> void InputSoftInfoStoreBreakpoint(string clipfile,
 		}
 		else 
 		{
-
 			//read a line of the bam file, if the line is without soft-clipping read, ignore it
 			while ((ret = samread(samfin, b) >= 0))
 			{
