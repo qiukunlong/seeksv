@@ -59,11 +59,10 @@ int main(int argc, char *argv[])
 
 void Usage(const char *prog)
 {
-	cerr << "Program: seeksv (software used to dectect structural variations)" << '\n'
-		 //<< "Compile Date: " << system("date") << '\n'
+	cerr << "Program: seeksv (a tool for structural variation detection and virus integration detection)" << '\n'
 		 << "Version: " << kVersion << '\n'
-		 << "Contract: " << "Kunlong Qiu(qkl871118@qq.com)\n\n"
-		 << "Usage: " << prog << " <command> [option]\n\n"
+		 << "Contact: " << "Kunlong Qiu(290832867@qq.com)\n\n"
+		 << "Usage: " << prog << " <command> [options]\n\n"
 		 << "Command: " << "getclip\tget soft-clipped reads\n"
 		 << "         " << "getsv  \tget final sv\n"
 		 << "         " << "somatic\tget somatic sv" << endl;
@@ -78,21 +77,21 @@ void Usage(const char *prog, char *command, int i)
 	{
 	case 0:
 		//cerr << "Usage: " << prog << " " << command << " [options] <in.sorted.bamfile> <out.soft clipped reads file> <out clipped sequence fastq file>\n\n";
-		cerr << "Usage: " << prog << " " << command << " [options] <in.sorted.bamfile>\n\n";
+		cerr << "Usage: " << prog << " " << command << " [options] <input.sorted.bam>\n\n";
 		cerr << "Options: -t <double>           Threshold of match rate while combining two soft-clipped reads [0.95]" << endl;
 		cerr << "         -q <int>              Minimum mapping quality of soft-clipped reads [20]" << endl;
 		cerr << "         -s                    Save the low quality sequence clipped before alignment by bwa." << endl;
 		cerr << "         -o <string>           Prefix of output files [output]" << endl;
 		break;
 	case 1:
-		cerr << "Usage: " << prog << " " << command << " [options] <bamfile of clipped sequence> <orignal sorted bamfile> <soft-clipped reads file> <breakpoint> <unmaped clipped sequence fastq result>\n"
+		cerr << "Usage: " << prog << " " << command << " [options] <input clipped sequence bam> <input orignal sorted bam> <soft-clipped reads file(*clip.gz)> <output SVs> <output unmaped clipped sequence fastq>\n"
 			 << "Options: -F <FILE>             Samfile/Bamfile of connected readthrough reads\n" 
 		//	 << "         -B <FILE>             temp breakpoint(sv) result\n"
 			 << "         -t <double>           Threshold of match rate while combining two soft-clipped reads [0.95]\n" 
 			 << "         -l <int>              Maximum search length to find microhomology[50]\n"
 			 << "         -q <int>              Minimum mapping quality of discordant read pair [20]\n"
 			 << "         -Q <int>              Minimum mapping quality of clipped sequences [1], if you use bwa samse to align the reads, please set\n"              << "                               this flag to 20\n"
-			 << "         -w <int>              Minimum mapping quality connected  readthrough reads [1]\n"
+			 << "         -w <int>              Minimum mapping quality of connected  readthrough reads [1]\n"
 			 << "         -n <int>              Number of segment(read pairs) used to calculate insert size default [5000000], if you donot want to use abnormal read pairs to call sv, set this parameter to 0.\n"
 			 << "         -r                    Turn off rescue mode. When rescure mode is on, the a SV with only 1 side with enough soft-clipped \n"
 			 << "                               reads is considered as a valid one instead of rejecting it.  Default on.\n"
@@ -103,15 +102,15 @@ void Usage(const char *prog, char *command, int i)
 			 << "         -e <int>              Minimum number of read pairs which support the junction [0]\n"
 			 << "         -f <int>              Minimun mutation frequency(left_pos_clip_percentage >= 0.1 or right_pos_clip_percentage >= 0.1) [0.1].\n"
 			 << "                               If you set -D, this value is invalid and set to [0].\n"
-			 << "         -T <int>              Maximum length of microhomology, microhomology length longer than [50] will be filtered\n"
+			 << "         -T <int>              Maximum length of microhomology, SV with microhomology length longer than [50] will be filtered\n"
 			 << "         -m <int>              Minimum length of up_seq or down_seq near the breakpoint when abnormal_read_pair_no == 0 [30]\n"
 			 << "         -i <int>              Maximum indel number of up_seq or down_seq near the breakpoint when abnormal_read_pair_no == 0 [1]\n"
-			 << "         -L <int>              Calculate average depth  [200] bp upstream or downstream of the breakpoints\n"
+			 << "         -L <int>              Calculate average depth of default [200] bp upstream or downstream of the breakpoints\n"
 			 << endl;
 		break;
 		
 	case 2:
-		cerr << "Usage: " << prog << " " << command << " [options] <normal original bam file> <normal soft-clipped reads file> <tumor breakpoint file> <output somatic breakpoint file>\n" << endl;
+		cerr << "Usage: " << prog << " " << command << " [options] <input normal original bam> <input normal soft-clipped reads file(*.clip.gz)> <input tumor SV file> <output somatic SV file>\n" << endl;
 		cerr << "         -t <int>              Threshold of match rate while comparing two soft-clipped reads [0.95]" << endl;
 		cerr << "         -q <int>              Minimum mapping quality of discordant read pair [20]" << endl;
 		cerr << "         -l <int>              Maximum search length to find microhomology [30]" << endl;
