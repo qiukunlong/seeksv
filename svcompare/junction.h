@@ -1,15 +1,3 @@
-/*
- *********************************************
- * getsv.h                                   *
- *                                           *
- *  Created on:   2011-5-24    v0.1.0        * 
- *  Modified on:  2013-1-10    v0.2.0        * 
- *  seeksv version:      0.8.0               * 
- *  Author:       qiukl                      * 
- *                                           * 
- *********************************************
- */
-
 #pragma once
 
 using namespace std;
