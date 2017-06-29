@@ -380,17 +380,21 @@ void MergeOverlap(map<ChrRange, unsigned long> &range2depth, map<pair<string, in
 
 /*function
  @abstract                                  Display the breakpoint results
- @param   rescure_mode                      Turn off rescue mode. When rescure mode is on, the a SV with only 1 side with enough soft-clipped reads is considered as a valid one instead of rejecting it.  Default on.
- @param   min_no_one_side_clipped_reads     When rescure mode is on, the minimum number of soft-clipped reads on one side [5] 
  @param   sum_min_no_both_clipped_reads     Minimum number of soft clipping read,it's the sum of left clipped reads and right clipped reads [3]
  @param   min_abnormal_read_pair_no         Minimum number of read pairs which support the junction [1]
  @param	  max_microhomology                 Maximum length of tandem repeat,  sv have tandem repeat length longer than [15] will be filtered
  @param   min_seq_len                       Minimum length of up_seq or down_seq near the breakpoint , if abnormal_read_pair_no is larger than 0, this parameter is invalid
  @param   max_seq_indel_no                  Maximum indel number of up_seq or down_seq near the breakpoint, if abnormal_read_pair_no is larger than 0, this parameter is invalid
 */
-void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2other, map<pair<string, int>, int> &pos2depth, map<ChrRange , unsigned long> &range2depth, map<Junction, pair<pair<ChrRange, ChrRange>, pair<ChrRange, ChrRange> > > &junction2range_pair, bool rescure_mode, int min_no_one_side_clipped_reads, int sum_min_no_both_clipped_reads, int min_abnormal_read_pair_no, double frequency, int min_distance, int max_microhomology, int min_seq_len, int max_seq_indel_no);
+void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2other, map<pair<string, int>, int> &pos2depth, map<ChrRange , unsigned long> &range2depth, map<Junction, pair<pair<ChrRange, ChrRange>, pair<ChrRange, ChrRange> > > &junction2range_pair, int sum_min_no_both_clipped_reads, int min_abnormal_read_pair_no, double frequency, int min_distance, int max_microhomology, int min_seq_len, int max_seq_indel_no);
 void OutputOneendUnmapBreakpoint(ofstream &fout, ofstream &fout1, multimap<pair<string, int>, ClipReads> &aligned2clipped, map<pair<string, int>, int> &pos2depth);
 
+void OutputFilteredBreakpoint(multimap<Junction, OtherInfo>::iterator &junction2other_it, string reason, int updepth, int downdepth, double rate1, double rate2);
+/*
+ * function
+ * @abstract Output one breakpoint 
+ */
+void OutputOneBreakpoint(ofstream &fout, multimap<Junction, OtherInfo>::iterator &junction2other_it, int updepth, int downdepth, int up_up_depth, int up_down_depth, int down_up_depth, int down_down_depth, double rate1, double rate2);
 
 /*function
  @abstract          Find number of discordant read pairs which support the structaral variation breakpoint                     

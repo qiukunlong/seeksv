@@ -9,7 +9,7 @@
 #include "cluster.h"
 #include "process_bwasw.h"
 
-const char *kVersion = "1.2.2";
+const char *kVersion = "1.2.3";
 //const char *kRevision = "43";
 const int kCommandQuantity = 4;
 const double kThreshold = 0.95;
@@ -93,9 +93,6 @@ void Usage(const char *prog, char *command, int i)
 			 << "         -Q <int>              Minimum mapping quality of clipped sequences [1], if you use bwa samse to align the reads, please set\n"              << "                               this flag to 20\n"
 			 << "         -w <int>              Minimum mapping quality of connected  readthrough reads [1]\n"
 			 << "         -n <int>              Number of segment(read pairs) used to calculate insert size default [5000000], if you donot want to use abnormal read pairs to call sv, set this parameter to 0.\n"
-			 << "         -r                    Turn off rescue mode. When rescure mode is on, the a SV with only 1 side with enough soft-clipped \n"
-			 << "                               reads is considered as a valid one instead of rejecting it.  Default on.\n"
-			 << "         -a <int>              When rescure mode is on, minimum number of soft-clipped reads on one side [5]\n" 
 			 << "         -b <int>              Minimum number of soft clipping read,it's the sum of left clipped reads and right clipped reads [3]\n"
 			 << "         -d <int>              Minimum distance between the clipped sequence position and the aligned sequence position [50]\n"
 			 << "         -D                    Do not calculate depth of the breakpoints and their ajacency regions\n"
@@ -161,8 +158,7 @@ void CallGetsv(int argc, char *argv[], int i)
 {
 	string connect_bam, temp_breakpoint;
 	double threshold = kThreshold, frequency = 0.1;
-	int c, flank = 50, min_mapQ = 20, min_mapQ1 = 1, min_mapQ2 = 1, read_pair_used = 5000000, baseQ = 0, min_no_one_side_clipped_reads = 5, sum_min_no_both_clipped_reads = 3, min_distance = 50, microhomology_length = 50, times = 4, min_abnormal_read_pair_no = 0, flank_length = 200, min_seq_len = 30, max_seq_indel_no = 1;
-	bool rescure_mode = 1;
+	int c, flank = 50, min_mapQ = 20, min_mapQ1 = 1, min_mapQ2 = 1, read_pair_used = 5000000, baseQ = 0, sum_min_no_both_clipped_reads = 3, min_distance = 50, microhomology_length = 50, times = 4, min_abnormal_read_pair_no = 0, flank_length = 200, min_seq_len = 30, max_seq_indel_no = 1;
 	bool output_depth = 1;
 	while ((c = getopt(argc, argv, "F:B:t:l:q:Q:w:n:a:b:d:e:m:i:R:f:T:L:rD")) >= 0)
 	{
@@ -176,8 +172,6 @@ void CallGetsv(int argc, char *argv[], int i)
 		case 'Q': min_mapQ1 = atoi(optarg); break;
 		case 'w': min_mapQ2 = atoi(optarg); break;
 		case 'n': read_pair_used = atoi(optarg); break; 
-		case 'r': rescure_mode = 0; break;
-		case 'a': min_no_one_side_clipped_reads = atoi(optarg); break;
 		case 'b': sum_min_no_both_clipped_reads = atoi(optarg); break;
 		case 'd': min_distance = atoi(optarg); break;
 		case 'e': min_abnormal_read_pair_no = atoi(optarg); break;
@@ -327,7 +321,7 @@ void CallGetsv(int argc, char *argv[], int i)
 		++junction2other_it;
 	}
 	*/
-	OutputBreakpoint(fout, junction2other, pos2depth, range2depth, junction2range_pair, rescure_mode, min_no_one_side_clipped_reads, sum_min_no_both_clipped_reads, min_abnormal_read_pair_no, frequency, min_distance, microhomology_length, min_seq_len, max_seq_indel_no);
+	OutputBreakpoint(fout, junction2other, pos2depth, range2depth, junction2range_pair, sum_min_no_both_clipped_reads, min_abnormal_read_pair_no, frequency, min_distance, microhomology_length, min_seq_len, max_seq_indel_no);
 
 	ofstream foutuq(clip_unmap_fq_file.c_str());
 	if (!foutuq) { cerr << "Cannot open file " << clip_unmap_fq_file << endl; exit(1); }

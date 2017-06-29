@@ -835,7 +835,7 @@ void MergeOverlap(map<ChrRange, unsigned long> &range2depth, map<pair<string, in
 }
 
 //int CountDepth(char *file[], const char *chr, int p, int baseQ, int mapQ, int n);
-void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2other, map<pair<string, int>, int> &pos2depth, map<ChrRange , unsigned long> &range2depth, map<Junction, pair<pair<ChrRange, ChrRange>, pair<ChrRange, ChrRange> > > &junction2range_pair, bool rescure_mode, int min_no_one_side_clipped_reads, int sum_min_no_both_clipped_reads, int min_abnormal_read_pair_no, double frequency, int min_distance, int max_microhomology, int min_seq_len, int max_seq_indel_no)
+void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2other, map<pair<string, int>, int> &pos2depth, map<ChrRange , unsigned long> &range2depth, map<Junction, pair<pair<ChrRange, ChrRange>, pair<ChrRange, ChrRange> > > &junction2range_pair, int sum_min_no_both_clipped_reads, int min_abnormal_read_pair_no, double frequency, int min_distance, int max_microhomology, int min_seq_len, int max_seq_indel_no)
 {
 	multimap<Junction, OtherInfo>::iterator junction2other_it = junction2other.begin();
 	map<Junction, pair<pair<ChrRange, ChrRange>, pair<ChrRange, ChrRange> > >::iterator junction2range_pair_it;
@@ -873,73 +873,119 @@ void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2ot
 		bool align_qual_pass = 0;
 		//if (junction2other_it->second.up_seq_info.is_clipped_seq_and_uniq_mapped + junction2other_it->second.down_seq_info.is_clipped_seq_and_uniq_mapped >= 2 || junction2other_it->second.abnormal_read_pair_no >= 2) align_qual_pass = 1;
 		if (junction2other_it->second.up_seq_info.is_clipped_seq_and_uniq_mapped + junction2other_it->second.down_seq_info.is_clipped_seq_and_uniq_mapped >= 2) align_qual_pass = 1;
+		else {
+			OutputFilteredBreakpoint(junction2other_it, "mappingQ_too_low", updepth, downdepth, rate1, rate2);
+			++junction2other_it;
+			continue;
+		}
+		if (junction2other_it->first.up_chr == junction2other_it->first.down_chr && \
+			abs(junction2other_it->first.up_pos - junction2other_it->first.down_pos) < min_distance) {
+			OutputFilteredBreakpoint(junction2other_it, "distance_too_near", updepth, downdepth, rate1, rate2);
+			++junction2other_it;
+			continue;
+		}
 
+		if (junction2other_it->second.microhomology_length > max_microhomology) {
+			OutputFilteredBreakpoint(junction2other_it, "microhomology_len_too_long", updepth, downdepth, rate1, rate2);
+			++junction2other_it;
+			continue;
+		}
 
-		if ((junction2other_it->first.up_chr != junction2other_it->first.down_chr || (junction2other_it->first.up_chr == junction2other_it->first.down_chr && abs(junction2other_it->first.up_pos - junction2other_it->first.down_pos) >= min_distance)) && junction2other_it->second.microhomology_length <= max_microhomology && junction2other_it->second.abnormal_read_pair_no >= min_abnormal_read_pair_no && (rate1 >= frequency || rate2 >= frequency) && (junction2other_it->second.microhomology_length == -1 && rescure_mode && (junction2other_it->second.up_seq_info.support_read_no >= min_no_one_side_clipped_reads || junction2other_it->second.down_seq_info.support_read_no >= min_no_one_side_clipped_reads) || (junction2other_it->second.microhomology_length != -1 && junction2other_it->second.up_seq_info.support_read_no + junction2other_it->second.down_seq_info.support_read_no >= sum_min_no_both_clipped_reads)) && ((junction2other_it->second.abnormal_read_pair_no == 0 && junction2other_it->second.up_seq_info.seq.length() >= junction2other_it->second.up_seq_info.left_clipped_seq_length + junction2other_it->second.up_seq_info.right_clipped_seq_length + min_seq_len && junction2other_it->second.down_seq_info.seq.length() >= junction2other_it->second.down_seq_info.left_clipped_seq_length + junction2other_it->second.down_seq_info.right_clipped_seq_length + min_seq_len && junction2other_it->second.up_seq_info.cigar_vec.size() <= 2 * max_seq_indel_no + 1 && junction2other_it->second.down_seq_info.cigar_vec.size() <= 2 * max_seq_indel_no + 1 && CountLargestBaseFrequency(junction2other_it->second.up_seq_info.seq) < 0.8 && CountLargestBaseFrequency(junction2other_it->second.down_seq_info.seq) < 0.8) || junction2other_it->second.abnormal_read_pair_no > 0) && align_qual_pass)
-		{
-			unsigned int up_up_depth = 0, up_down_depth = 0, down_up_depth = 0, down_down_depth = 0;
-			junction2range_pair_it = junction2range_pair.find(Junction(junction2other_it->first.up_chr, junction2other_it->first.up_pos, junction2other_it->first.up_strand, junction2other_it->first.down_chr, junction2other_it->first.down_pos, junction2other_it->first.down_strand));
-			if (junction2range_pair_it != junction2range_pair.end())
-			{
-				range2depth_it = range2depth.find(junction2range_pair_it->second.first.first);	
-				if (range2depth_it == range2depth.end())
-				{
-					cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
-				}
-				else
-				{
-					up_up_depth = range2depth_it->second / (range2depth_it->first.end - range2depth_it->first.begin + 1);
-				}
-
-				range2depth_it = range2depth.find(junction2range_pair_it->second.first.second);	
-				if (range2depth_it == range2depth.end())
-				{
-					cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
-				}
-				else
-				{
-					up_down_depth = range2depth_it->second / (range2depth_it->first.end - range2depth_it->first.begin + 1);
-				}
-
-				range2depth_it = range2depth.find(junction2range_pair_it->second.second.first);	
-				if (range2depth_it == range2depth.end())
-				{
-					cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
-				}
-				else
-				{
-					down_up_depth = range2depth_it->second / (range2depth_it->first.end - range2depth_it->first.begin + 1);
-				}
-
-				range2depth_it = range2depth.find(junction2range_pair_it->second.second.second);	
-				if (range2depth_it == range2depth.end())
-				{
-					cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
-				}
-				else
-				{
-					down_down_depth = range2depth_it->second / (range2depth_it->first.end - range2depth_it->first.begin + 1);
-				}
+		if (junction2other_it->second.abnormal_read_pair_no < min_abnormal_read_pair_no) {
+			OutputFilteredBreakpoint(junction2other_it, "abnormal_read_pair_no_not_pass", updepth, downdepth, rate1, rate2);
+			++junction2other_it;
+			continue;
+		}
+		if (junction2other_it->second.up_seq_info.support_read_no > 0 && junction2other_it->second.down_seq_info.support_read_no > 0) {
+			if (rate1 < frequency && rate2 < frequency) {
+				OutputFilteredBreakpoint(junction2other_it, "frequency_too_low", updepth, downdepth, rate1, rate2);
+				++junction2other_it;
+				continue;
 			}
-			else
+		}
+		else {
+			if (rate1 < frequency || rate2 < frequency) {
+				OutputFilteredBreakpoint(junction2other_it, "frequency_too_low", updepth, downdepth, rate1, rate2);
+				++junction2other_it;
+				continue;
+			}
+		}
+
+		if (junction2other_it->second.up_seq_info.support_read_no + junction2other_it->second.down_seq_info.support_read_no < sum_min_no_both_clipped_reads) {
+			OutputFilteredBreakpoint(junction2other_it, "total_clipped_reads_NO_not_pass", updepth, downdepth, rate1, rate2);
+			++junction2other_it;
+			continue;
+		}
+
+		if (junction2other_it->second.abnormal_read_pair_no == 0) { 
+			if (junction2other_it->second.up_seq_info.seq.length() < junction2other_it->second.up_seq_info.left_clipped_seq_length + junction2other_it->second.up_seq_info.right_clipped_seq_length + min_seq_len || junction2other_it->second.down_seq_info.seq.length() < junction2other_it->second.down_seq_info.left_clipped_seq_length + junction2other_it->second.down_seq_info.right_clipped_seq_length + min_seq_len) {
+				OutputFilteredBreakpoint(junction2other_it, "seq_length_too_short", updepth, downdepth, rate1, rate2);
+				++junction2other_it;
+				continue;
+			}
+			if (junction2other_it->second.up_seq_info.cigar_vec.size() > 2 * max_seq_indel_no + 1 || \
+				junction2other_it->second.down_seq_info.cigar_vec.size() > 2 * max_seq_indel_no + 1) {
+				OutputFilteredBreakpoint(junction2other_it, "seq_with_too_many_indels", updepth, downdepth, rate1, rate2);
+				++junction2other_it;
+				continue;
+			}
+			if (CountLargestBaseFrequency(junction2other_it->second.up_seq_info.seq) >= 0.8 || \
+				CountLargestBaseFrequency(junction2other_it->second.down_seq_info.seq) >= 0.8) {
+				OutputFilteredBreakpoint(junction2other_it, "repeat_bases", updepth, downdepth, rate1, rate2);
+				++junction2other_it;
+				continue;
+			}
+		}
+
+		unsigned int up_up_depth = 0, up_down_depth = 0, down_up_depth = 0, down_down_depth = 0;
+		junction2range_pair_it = junction2range_pair.find(Junction(junction2other_it->first.up_chr, junction2other_it->first.up_pos, junction2other_it->first.up_strand, junction2other_it->first.down_chr, junction2other_it->first.down_pos, junction2other_it->first.down_strand));
+		if (junction2range_pair_it != junction2range_pair.end())
+		{
+			range2depth_it = range2depth.find(junction2range_pair_it->second.first.first);	
+			if (range2depth_it == range2depth.end())
 			{
 				cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
 			}
-			string sv_type = GetSVType(junction2other_it->first.up_chr, junction2other_it->first.up_pos, junction2other_it->first.up_strand, junction2other_it->first.down_chr, junction2other_it->first.down_pos, junction2other_it->first.down_strand);
-			fout << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t' << junction2other_it->second.up_seq_info.support_read_no << '\t' << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << '\t' << junction2other_it->second.down_seq_info.support_read_no << '\t' << junction2other_it->second.microhomology_length << '\t' << junction2other_it->second.abnormal_read_pair_no << '\t' << sv_type << '\t' << updepth << '\t' << downdepth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << rate1 << '\t' << rate2 << '\t';
-			DisplayCigarVector<ostream> (fout, junction2other_it->second.up_seq_info.cigar_vec, junction2other_it->second.up_seq_info.left_clipped_seq_length, junction2other_it->second.up_seq_info.right_clipped_seq_length);
-			fout << '\t';
-			DisplayCigarVector<ostream> (fout, junction2other_it->second.down_seq_info.cigar_vec, junction2other_it->second.down_seq_info.left_clipped_seq_length, junction2other_it->second.down_seq_info.right_clipped_seq_length);
-			fout << '\t' << junction2other_it->second.up_seq_info.seq << '\t' << junction2other_it->second.down_seq_info.seq << endl;
+			else
+			{
+				up_up_depth = range2depth_it->second / (range2depth_it->first.end - range2depth_it->first.begin + 1);
+			}
 
+			range2depth_it = range2depth.find(junction2range_pair_it->second.first.second);	
+			if (range2depth_it == range2depth.end())
+			{
+				cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
+			}
+			else
+			{
+				up_down_depth = range2depth_it->second / (range2depth_it->first.end - range2depth_it->first.begin + 1);
+			}
+
+			range2depth_it = range2depth.find(junction2range_pair_it->second.second.first);	
+			if (range2depth_it == range2depth.end())
+			{
+				cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
+			}
+			else
+			{
+				down_up_depth = range2depth_it->second / (range2depth_it->first.end - range2depth_it->first.begin + 1);
+			}
+
+			range2depth_it = range2depth.find(junction2range_pair_it->second.second.second);	
+			if (range2depth_it == range2depth.end())
+			{
+				cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
+			}
+			else
+			{
+				down_down_depth = range2depth_it->second / (range2depth_it->first.end - range2depth_it->first.begin + 1);
+			}
 		}
-		//test
-		else {
-			cout << "updepth:" << updepth << '\t' << "downdepth" << downdepth << endl;
-			string sv_type = GetSVType(junction2other_it->first.up_chr, junction2other_it->first.up_pos, junction2other_it->first.up_strand, junction2other_it->first.down_chr, junction2other_it->first.down_pos, junction2other_it->first.down_strand);
-			cout << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t' << junction2other_it->second.up_seq_info.support_read_no << '\t' << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << '\t' << junction2other_it->second.down_seq_info.support_read_no << '\t' << junction2other_it->second.microhomology_length << '\t' << junction2other_it->second.abnormal_read_pair_no << '\t' << sv_type << endl;
-		
+		else
+		{
+			cerr << "Error depth in the vicinity of junction " << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t'  << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << endl;
 		}
+		OutputOneBreakpoint(fout, junction2other_it, updepth, downdepth, up_up_depth, up_down_depth, down_up_depth, down_down_depth, rate1, rate2);
 		++junction2other_it;
 	}
 	
@@ -1801,4 +1847,21 @@ void GetJunction(AlignReadsInfo &align_reads_info, char orientation, AlignInfo &
 		ClipReads clip_reads(aligned_seq_info, orientation, clipped_seq, clipped_qual, clipped_align_info.type);
 		aligned2clipped.insert(make_pair(make_pair(chr, pos), clip_reads));
 	}
+}
+void OutputFilteredBreakpoint(multimap<Junction, OtherInfo>::iterator &junction2other_it, string reason, int updepth, int downdepth, double rate1, double rate2) {
+	string sv_type = GetSVType(junction2other_it->first.up_chr, junction2other_it->first.up_pos, junction2other_it->first.up_strand, junction2other_it->first.down_chr, junction2other_it->first.down_pos, junction2other_it->first.down_strand);
+	cout << reason << '\t' << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t' << junction2other_it->second.up_seq_info.support_read_no << '\t' << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << '\t' << junction2other_it->second.down_seq_info.support_read_no << '\t' << junction2other_it->second.microhomology_length << '\t' << junction2other_it->second.abnormal_read_pair_no << '\t' << sv_type << '\t' << updepth << '\t' << downdepth << '\t' << rate1 << '\t' << rate2 << '\t';
+	DisplayCigarVector<ostream> (cout, junction2other_it->second.up_seq_info.cigar_vec, junction2other_it->second.up_seq_info.left_clipped_seq_length, junction2other_it->second.up_seq_info.right_clipped_seq_length);
+	cout << '\t';
+	DisplayCigarVector<ostream> (cout, junction2other_it->second.down_seq_info.cigar_vec, junction2other_it->second.down_seq_info.left_clipped_seq_length, junction2other_it->second.down_seq_info.right_clipped_seq_length);
+	cout << '\t' << junction2other_it->second.up_seq_info.seq << '\t' << junction2other_it->second.down_seq_info.seq << endl;
+}
+
+void OutputOneBreakpoint(ofstream &fout, multimap<Junction, OtherInfo>::iterator &junction2other_it, int updepth, int downdepth, int up_up_depth, int up_down_depth, int down_up_depth, int down_down_depth, double rate1, double rate2) {
+	string sv_type = GetSVType(junction2other_it->first.up_chr, junction2other_it->first.up_pos, junction2other_it->first.up_strand, junction2other_it->first.down_chr, junction2other_it->first.down_pos, junction2other_it->first.down_strand);
+	fout << junction2other_it->first.up_chr << '\t' << junction2other_it->first.up_pos << '\t' << junction2other_it->first.up_strand << '\t' << junction2other_it->second.up_seq_info.support_read_no << '\t' << junction2other_it->first.down_chr << '\t' << junction2other_it->first.down_pos << '\t' << junction2other_it->first.down_strand << '\t' << junction2other_it->second.down_seq_info.support_read_no << '\t' << junction2other_it->second.microhomology_length << '\t' << junction2other_it->second.abnormal_read_pair_no << '\t' << sv_type << '\t' << updepth << '\t' << downdepth << '\t' << up_up_depth << '\t' << up_down_depth << '\t' << down_up_depth << '\t' << down_down_depth << '\t' << rate1 << '\t' << rate2 << '\t';
+	DisplayCigarVector<ostream> (fout, junction2other_it->second.up_seq_info.cigar_vec, junction2other_it->second.up_seq_info.left_clipped_seq_length, junction2other_it->second.up_seq_info.right_clipped_seq_length);
+	fout << '\t';
+	DisplayCigarVector<ostream> (fout, junction2other_it->second.down_seq_info.cigar_vec, junction2other_it->second.down_seq_info.left_clipped_seq_length, junction2other_it->second.down_seq_info.right_clipped_seq_length);
+	fout << '\t' << junction2other_it->second.up_seq_info.seq << '\t' << junction2other_it->second.down_seq_info.seq << endl;
 }

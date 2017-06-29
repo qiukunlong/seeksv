@@ -174,3 +174,8 @@ seeksv version 1.2.2
 	Date:2017-06-27
 	Change default value of getclip -t, getsv -t, somatic -t from 0.85 to 0.95
 	Remove option `-R` of getsv, from this version, donot filter SVs by depth of the break coordinate
+
+seeksv version 1.2.3
+	Date:2017-06-29
+	Remove options `-r` and `-a` of `seeksv getsv`, `seeksv getsv` will always use rescue mode from this version.
+	Output filtered SVs in standard output
