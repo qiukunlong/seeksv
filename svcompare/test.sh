@@ -1,0 +1,1 @@
+./svcompare simu /ifs2/BC_DE/CANCER/qiukl/rearrangement/simu_data/simu2/simu_chr/cancer.sv.info /ifs2/BC_DE/CANCER/qiukl/rearrangement/simu_data/simu2/simu_chr/cancer.cnv.info /ifs2/BC_DE/CANCER/qiukl/rearrangement/pipeline/output3/cancer/cancer.breakpoint error.breakpoint not_found.breakpoint 2>repeat.breakpoint >share.breakpoint
