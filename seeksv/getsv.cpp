@@ -872,7 +872,7 @@ void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2ot
 		
 		bool align_qual_pass = 0;
 		//if (junction2other_it->second.up_seq_info.is_clipped_seq_and_uniq_mapped + junction2other_it->second.down_seq_info.is_clipped_seq_and_uniq_mapped >= 2 || junction2other_it->second.abnormal_read_pair_no >= 2) align_qual_pass = 1;
-		if (junction2other_it->second.up_seq_info.is_clipped_seq_and_uniq_mapped + junction2other_it->second.down_seq_info.is_clipped_seq_and_uniq_mapped >= 2) align_qual_pass = 1;
+		if (junction2other_it->second.up_seq_info.is_clipped_seq_and_uniq_mapped + junction2other_it->second.down_seq_info.is_clipped_seq_and_uniq_mapped >= 2 || junction2other_it->second.abnormal_read_pair_no > 0) align_qual_pass = 1;
 		else {
 			OutputFilteredBreakpoint(junction2other_it, "mappingQ_too_low", updepth, downdepth, rate1, rate2);
 			++junction2other_it;
@@ -896,19 +896,14 @@ void OutputBreakpoint(ofstream &fout, multimap<Junction, OtherInfo> &junction2ot
 			++junction2other_it;
 			continue;
 		}
-		if (junction2other_it->second.up_seq_info.support_read_no > 0 && junction2other_it->second.down_seq_info.support_read_no > 0) {
-			if (rate1 < frequency && rate2 < frequency) {
-				OutputFilteredBreakpoint(junction2other_it, "frequency_too_low", updepth, downdepth, rate1, rate2);
-				++junction2other_it;
-				continue;
-			}
-		}
-		else {
-			if (rate1 < frequency || rate2 < frequency) {
-				OutputFilteredBreakpoint(junction2other_it, "frequency_too_low", updepth, downdepth, rate1, rate2);
-				++junction2other_it;
-				continue;
-			}
+		if (junction2other_it->second.up_seq_info.support_read_no > 0 && \
+			junction2other_it->second.down_seq_info.support_read_no > 0 && \
+			rate1 < frequency && rate2 < frequency || \
+			junction2other_it->second.up_seq_info.support_read_no == 0 && rate2 < frequency || \
+			junction2other_it->second.down_seq_info.support_read_no == 0 && rate1 < frequency) {
+			OutputFilteredBreakpoint(junction2other_it, "frequency_too_low", updepth, downdepth, rate1, rate2);
+			++junction2other_it;
+			continue;
 		}
 
 		if (junction2other_it->second.up_seq_info.support_read_no + junction2other_it->second.down_seq_info.support_read_no < sum_min_no_both_clipped_reads) {
