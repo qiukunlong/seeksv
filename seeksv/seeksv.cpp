@@ -12,7 +12,7 @@
 const char *kVersion = "1.2.3";
 //const char *kRevision = "43";
 const int kCommandQuantity = 4;
-const double kThreshold = 0.95;
+const double kThreshold = 0.9;
 const int kNumberOfReadPair = 5000000;
 
 void Usage(const char *prog);
@@ -78,8 +78,8 @@ void Usage(const char *prog, char *command, int i)
 	case 0:
 		//cerr << "Usage: " << prog << " " << command << " [options] <in.sorted.bamfile> <out.soft clipped reads file> <out clipped sequence fastq file>\n\n";
 		cerr << "Usage: " << prog << " " << command << " [options] <input.sorted.bam>\n\n";
-		cerr << "Options: -t <double>           Threshold of match rate while combining two soft-clipped reads [0.95]" << endl;
-		cerr << "         -q <int>              Minimum mapping quality of soft-clipped reads [20]" << endl;
+		cerr << "Options: -t <double>           Threshold of match rate while combining two soft-clipped reads [0.9]" << endl;
+		cerr << "         -q <int>              Minimum mapping quality of soft-clipped reads [1]" << endl;
 		cerr << "         -s                    Save the low quality sequence clipped before alignment by bwa." << endl;
 		cerr << "         -o <string>           Prefix of output files [output]" << endl;
 		break;
@@ -87,7 +87,7 @@ void Usage(const char *prog, char *command, int i)
 		cerr << "Usage: " << prog << " " << command << " [options] <input clipped sequence bam> <input orignal sorted bam> <soft-clipped reads file(*clip.gz)> <output SVs> <output unmaped clipped sequence fastq>\n"
 			 << "Options: -F <FILE>             Samfile/Bamfile of connected readthrough reads\n" 
 		//	 << "         -B <FILE>             temp breakpoint(sv) result\n"
-			 << "         -t <double>           Threshold of match rate while combining two soft-clipped reads [0.95]\n" 
+			 << "         -t <double>           Threshold of match rate while combining two soft-clipped reads [0.9]\n" 
 			 << "         -l <int>              Maximum search length to find microhomology[50]\n"
 			 << "         -q <int>              Minimum mapping quality of discordant read pair [20]\n"
 			 << "         -Q <int>              Minimum mapping quality of clipped sequences [1], if you use bwa samse to align the reads, please set\n"              << "                               this flag to 20\n"
@@ -108,7 +108,7 @@ void Usage(const char *prog, char *command, int i)
 		
 	case 2:
 		cerr << "Usage: " << prog << " " << command << " [options] <input normal original bam> <input normal soft-clipped reads file(*.clip.gz)> <input tumor SV file> <output somatic SV file>\n" << endl;
-		cerr << "         -t <int>              Threshold of match rate while comparing two soft-clipped reads [0.95]" << endl;
+		cerr << "         -t <int>              Threshold of match rate while comparing two soft-clipped reads [0.9]" << endl;
 		cerr << "         -q <int>              Minimum mapping quality of discordant read pair [20]" << endl;
 		cerr << "         -l <int>              Maximum search length to find microhomology [30]" << endl;
 		cerr << "         -m <int>              Minimum length of the clipped sequence  in normal [10]" << endl;
@@ -127,7 +127,7 @@ void Usage(const char *prog, char *command, int i)
 
 void CallGetclip(int argc, char *argv[], int i)
 {
-	int c, min_mapQ = 20;
+	int c, min_mapQ = 1;
 	double threshold = kThreshold;
 	string prefix = "output";
 	bool save_low_quality = 0;
@@ -366,7 +366,7 @@ void CallGetsv(int argc, char *argv[], int i)
 void CallSomatic(int argc, char *argv[], int i)
 {
 	int offset = 30, c, min_len_of_clipped_seq = 10, read_pair_used = 5000000, min_mapQ = 20;
-	double min_map_rate = 0.95;
+	double min_map_rate = 0.9;
 	while ((c = getopt(argc, argv, "t:q:l:m:n:")) >= 0)
 	{
 		switch (c)

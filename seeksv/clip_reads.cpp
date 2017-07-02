@@ -56,19 +56,49 @@ bool ReadsInfo::add_materead_id(string id)
 //aa true means left clipped
 bool ReadsInfo::ChangeSeqAndQual(string s_l, string q_l, string s_r, string q_r, const vector<pair<int, char> > &cigar, bool aa)
 {
-	if (seq_left.length() < s_l.length())
+	size_t len1 = seq_left.length();
+	size_t len2 = s_l.length();
+	size_t len = seq_left.length() < s_l.length() ? seq_left.length() : s_l.length();
+	size_t long_len = seq_left.length() >= s_l.length() ? seq_left.length() : s_l.length();
+
+	for (int i = 0; i < len; i++) {
+		if (qual_left[len1-1-i] < q_l[len2-1-i]) {
+			qual_left[len1-1-i] = q_l[len2-1-i];
+			if (seq_left[len1-1-i] != s_l[len2-1-i]) {
+				seq_left[len1-1-i] = s_l[len2-1-i];
+			}
+		}
+	}
+	if (seq_left.length() <= s_l.length())
 	{
-		seq_left = s_l;
-		qual_left = q_l;
+		string tmp = seq_left;
+		seq_left = s_l.substr(0, long_len - len);
+		seq_left.append(tmp);
+		tmp = qual_left;
+		qual_left = q_l.substr(0, long_len - len);
+		qual_left.append(tmp);
 		if (aa == RIGHT_CLIPPED)
 		{
 			cigar_vec = cigar;
 		}
 	}
+
+	len = seq_right.length() < s_r.length() ? seq_right.length() : s_r.length();
+	long_len = seq_right.length() >= s_r.length() ? seq_right.length() : s_r.length();
+
+	for (int i = 0; i < len; i++) {
+		if (qual_right[i] < q_r[i]) {
+			qual_right[i] = q_r[i];
+			if (seq_right[i] != s_r[i]) {
+				seq_right[i] = s_r[i];
+			}
+		}
+	}
+	
 	if (seq_right.length() < s_r.length())
 	{
-		seq_right = s_r;
-		qual_right = q_r;
+		seq_right.append(s_r, len, long_len - len);
+		qual_right.append(q_r, len, long_len - len);
 		if (aa == LEFT_CLIPPED)
 		{
 			cigar_vec = cigar;
