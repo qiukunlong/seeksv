@@ -45,7 +45,7 @@ def breakpoint2vcfRecord(breakpoint_dict, breakpoint_id):
 			ALT=[alt1], \
 			QUAL='.', \
 			FILTER='PASS', \
-			INFO={'PARID' : breakend_up, 'MATEID' : breakend_down, "WHICHEND" : "UP"}, \
+			INFO={'MATEID' : breakend_down, "WHICHEND" : "UP"}, \
 			FORMAT='.', \
 			sample_indexes='.')
 
@@ -57,7 +57,7 @@ def breakpoint2vcfRecord(breakpoint_dict, breakpoint_id):
 			ALT=[alt2], \
 			QUAL='.', \
 			FILTER='PASS', \
-			INFO={'PARID' : breakend_down, 'MATEID' : breakend_up, 'WHICHEND' : 'DOWN'}, \
+			INFO={'MATEID' : breakend_up, 'WHICHEND' : 'DOWN'}, \
 			FORMAT='.', \
 			sample_indexes='.')
 	return record1, record2
