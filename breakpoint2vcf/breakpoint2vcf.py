@@ -25,14 +25,14 @@ def breakpoint2vcfRecord(breakpoint_dict, breakpoint_id):
 		alt2 = vcf.model._Breakend(breakpoint_dict['left_chr'], left_pos, True, False, ref2, None)
 	elif breakpoint_dict['left_strand'] == '+' and breakpoint_dict['right_strand'] == '-':
 		ref1 = breakpoint_dict['left_seq'][-1]
-		alt1 = vcf.model._Breakend(breakpoint_dict['right_chr'], right_pos, True, True, ref1, None)
+		alt1 = vcf.model._Breakend(breakpoint_dict['right_chr'], right_pos, False, False, ref1, None)
 		ref2 = base_reverse_complementary[breakpoint_dict['right_seq'][0]]
-		alt2 = vcf.model._Breakend(breakpoint_dict['left_chr'], left_pos, True, True, ref2, None)
+		alt2 = vcf.model._Breakend(breakpoint_dict['left_chr'], left_pos, False, False, ref2, None)
 	elif breakpoint_dict['left_strand'] == '-' and breakpoint_dict['right_strand'] == '+':
 		ref1 = base_reverse_complementary[breakpoint_dict['left_seq'][-1]]
-		alt1 = vcf.model._Breakend(breakpoint_dict['right_chr'], right_pos, False, False, ref1, None)
+		alt1 = vcf.model._Breakend(breakpoint_dict['right_chr'], right_pos, True, True, ref1, None)
 		ref2 = breakpoint_dict['right_seq'][0]
-		alt2 = vcf.model._Breakend(breakpoint_dict['left_chr'], left_pos, False, False, ref2, None)
+		alt2 = vcf.model._Breakend(breakpoint_dict['left_chr'], left_pos, True, True, ref2, None)
 	
 	breakend_up = "bnt" + str(breakpoint_id) + "_U"
 	breakend_down = "bnt" + str(breakpoint_id) + "_D"
