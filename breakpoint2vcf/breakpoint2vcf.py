@@ -45,7 +45,9 @@ def breakpoint2vcfRecord(breakpoint_dict, breakpoint_id):
 			ALT=[alt1], \
 			QUAL='.', \
 			FILTER='PASS', \
-			INFO={'SVTYPE' :'BND', 'MATEID' : breakend_down}, \
+			INFO={'SVTYPE' :'BND', 'MATEID' : breakend_down, 'LEFT_CLIP_READ_NO' : breakpoint_dict['left_clip_read_NO'], \
+					'LEFT_STRAND' : breakpoint_dict['left_strand'], 'ABNORMAL_READPAIR_NO' : breakpoint_dict['abnormal_readpair_NO'], \
+					'LEFT_POS_DEPTH' : breakpoint_dict['left_pos_depth']}, \
 			FORMAT='.', \
 			sample_indexes='.')
 
@@ -57,7 +59,9 @@ def breakpoint2vcfRecord(breakpoint_dict, breakpoint_id):
 			ALT=[alt2], \
 			QUAL='.', \
 			FILTER='PASS', \
-			INFO={'SVTYPE' :'BND', 'MATEID' : breakend_up}, \
+			INFO={'SVTYPE' :'BND', 'MATEID' : breakend_up, 'RIGHT_CLIP_READ_NO' : breakpoint_dict['right_clip_read_NO'], \
+					'RIGHT_STRAND' : breakpoint_dict['right_strand'], 'ABNORMAL_READPAIR_NO' : breakpoint_dict['abnormal_readpair_NO'], \
+					'RIGHT_POS_DEPTH': breakpoint_dict['right_pos_depth']}, \
 			FORMAT='.', \
 			sample_indexes='.')
 	return record1, record2
@@ -70,7 +74,7 @@ def readBreakpointFile(breakpoint_file, template_vcf, vcf_file):
 		header = header.strip()
 		header_items = header.split("\t")
 	else:
-	 	sys.stderr.write("Error: breapoint file header should be start with '@'\n")
+	 	sys.stderr.write("Error: breapoint file header should start with '@'\n")
 		exit(1)
 	vcf_writer = vcf.Writer(open(vcf_file, 'w'), vcf.Reader(filename=template_vcf))
 	breakpoint_id = 1
