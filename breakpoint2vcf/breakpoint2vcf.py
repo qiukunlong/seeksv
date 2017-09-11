@@ -34,8 +34,8 @@ def breakpoint2vcfRecord(breakpoint_dict, breakpoint_id):
 		ref2 = breakpoint_dict['right_seq'][0]
 		alt2 = vcf.model._Breakend(breakpoint_dict['left_chr'], left_pos, True, True, ref2, None)
 	
-	breakend_up = "bnt" + str(breakpoint_id) + "_U"
-	breakend_down = "bnt" + str(breakpoint_id) + "_D"
+	breakend_up = "bnd" + str(breakpoint_id) + "_U"
+	breakend_down = "bnd" + str(breakpoint_id) + "_D"
 
 	record1 = vcf.model._Record(\
 			CHROM=breakpoint_dict['left_chr'], \
