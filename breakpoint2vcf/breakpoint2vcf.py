@@ -45,9 +45,9 @@ def breakpoint2vcfRecord(breakpoint_dict, breakpoint_id):
 			ALT=[alt1], \
 			QUAL='.', \
 			FILTER='PASS', \
-			INFO={'SVTYPE' :'BND', 'MATEID' : breakend_down, 'LEFT_CLIP_READ_NO' : breakpoint_dict['left_clip_read_NO'], \
-					'LEFT_STRAND' : breakpoint_dict['left_strand'], 'ABNORMAL_READPAIR_NO' : breakpoint_dict['abnormal_readpair_NO'], \
-					'LEFT_POS_DEPTH' : breakpoint_dict['left_pos_depth']}, \
+			INFO={'SVTYPE' :'BND', 'MATEID' : breakend_down, 'CLIP_READ_NO' : breakpoint_dict['left_clip_read_NO'], \
+					'STRAND' : breakpoint_dict['left_strand'], 'ABNORMAL_READPAIR_NO' : breakpoint_dict['abnormal_readpair_NO'], \
+					'DEPTH' : breakpoint_dict['left_pos_depth']}, \
 			FORMAT='.', \
 			sample_indexes='.')
 
@@ -59,9 +59,9 @@ def breakpoint2vcfRecord(breakpoint_dict, breakpoint_id):
 			ALT=[alt2], \
 			QUAL='.', \
 			FILTER='PASS', \
-			INFO={'SVTYPE' :'BND', 'MATEID' : breakend_up, 'RIGHT_CLIP_READ_NO' : breakpoint_dict['right_clip_read_NO'], \
-					'RIGHT_STRAND' : breakpoint_dict['right_strand'], 'ABNORMAL_READPAIR_NO' : breakpoint_dict['abnormal_readpair_NO'], \
-					'RIGHT_POS_DEPTH': breakpoint_dict['right_pos_depth']}, \
+			INFO={'SVTYPE' :'BND', 'MATEID' : breakend_up, 'CLIP_READ_NO' : breakpoint_dict['right_clip_read_NO'], \
+					'STRAND' : breakpoint_dict['right_strand'], 'ABNORMAL_READPAIR_NO' : breakpoint_dict['abnormal_readpair_NO'], \
+					'DEPTH': breakpoint_dict['right_pos_depth']}, \
 			FORMAT='.', \
 			sample_indexes='.')
 	return record1, record2
